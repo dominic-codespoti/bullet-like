@@ -1,9 +1,11 @@
+using BulletLike.Events;
+using BulletLike.GameObjectExtensions;
 using UnityEngine;
 
 namespace BulletLike.Enemy
 {
-  [RequireComponent(typeof(Rigidbody))]
-  public class EnemyShooter : MonoBehaviour
+  [RequireComponent(typeof(Rigidbody), typeof(EnemyHitIndicator))]
+  public class EnemyShooter : MonoBehaviour, IDamageable
   {
       [Header("Shooting Settings")]
       [SerializeField] private GameObject bulletPrefab;
@@ -34,13 +36,30 @@ namespace BulletLike.Enemy
       [Tooltip("Speed of the bobbing motion.")]
       [SerializeField] private float bobFrequency = 2f;
 
+      [Header("Stats")]
+      [SerializeField] private int maxHealth = 10;
+
       private Rigidbody _rb;
       private float _timer;
+      private int _currentHealth;
+
+      public void TakeDamage(float damage)
+      {
+          _currentHealth -= (int)damage;
+          if (_currentHealth <= 0)
+          {
+              Destroy(gameObject);
+          }
+
+          Debug.Log($"Event {nameof(DamageTakenEvent)} published for {this.Id()}");
+          EventManager.Publish(new DamageTakenEvent(damage), this.Id());
+      }
 
       private void Awake()
       {
           _rb = GetComponent<Rigidbody>();
           _rb.useGravity = false;
+          _currentHealth = maxHealth;
       }
 
       private void Start()
