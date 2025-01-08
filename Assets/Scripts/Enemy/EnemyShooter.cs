@@ -1,137 +1,134 @@
-using BulletLike.Events;
-using BulletLike.GameObjectExtensions;
+using Events;
 using UnityEngine;
 
-namespace BulletLike.Enemy
+namespace Enemy
 {
-  [RequireComponent(typeof(Rigidbody), typeof(EnemyHitIndicator))]
-  public class EnemyShooter : MonoBehaviour, IDamageable
-  {
-      [Header("Shooting Settings")]
-      [SerializeField] private GameObject bulletPrefab;
-      [SerializeField] private float shootInterval = 1f;
-      [SerializeField] private int bulletCount = 10;
-      [SerializeField] private float bulletSpeed = 10f;
+    [RequireComponent(typeof(Rigidbody), typeof(EnemyHitIndicator))]
+    public class EnemyShooter : MonoBehaviour, IDamageable
+    {
+        [Header("Shooting Settings")] [SerializeField]
+        private GameObject bulletPrefab;
 
-      [Header("Movement Settings")]
-      [Tooltip("Player Transform to seek and orbit. If left empty, will try to find an object tagged 'Player'.")]
-      [SerializeField] private Transform player;
+        [SerializeField] private float shootInterval = 1f;
+        [SerializeField] private int bulletCount = 10;
+        [SerializeField] private float bulletSpeed = 10f;
 
-      [Tooltip("Distance at which the enemy stops approaching and begins orbiting.")]
-      [SerializeField] private float orbitDistance = 5f;
+        [Header("Movement Settings")]
+        [Tooltip("Player Transform to seek and orbit. If left empty, will try to find an object tagged 'Player'.")]
+        [SerializeField]
+        private Transform player;
 
-      [Tooltip("Horizontal speed at which the enemy approaches the player.")]
-      [SerializeField] private float approachSpeed = 3f;
+        [Tooltip("Distance at which the enemy stops approaching and begins orbiting.")] [SerializeField]
+        private float orbitDistance = 5f;
 
-      [Tooltip("Speed at which the enemy orbits the player once close.")]
-      [SerializeField] private float orbitSpeed = 45f;
+        [Tooltip("Horizontal speed at which the enemy approaches the player.")] [SerializeField]
+        private float approachSpeed = 3f;
 
-      [Header("Floating Settings")]
-      [Tooltip("How high above the player's position the enemy should hover.")]
-      [SerializeField] private float offsetAbovePlayer = 2f;
+        [Tooltip("Speed at which the enemy orbits the player once close.")] [SerializeField]
+        private float orbitSpeed = 45f;
 
-      [Tooltip("Amplitude of a bobbing motion above the offset (0 = no bob).")]
-      [SerializeField] private float bobAmplitude = 0.5f;
+        [Header("Floating Settings")]
+        [Tooltip("How high above the player's position the enemy should hover.")]
+        [SerializeField]
+        private float offsetAbovePlayer = 2f;
 
-      [Tooltip("Speed of the bobbing motion.")]
-      [SerializeField] private float bobFrequency = 2f;
+        [Tooltip("Amplitude of a bobbing motion above the offset (0 = no bob).")] [SerializeField]
+        private float bobAmplitude = 0.5f;
 
-      [Header("Stats")]
-      [SerializeField] private int maxHealth = 10;
+        [Tooltip("Speed of the bobbing motion.")] [SerializeField]
+        private float bobFrequency = 2f;
 
-      private Rigidbody _rb;
-      private float _timer;
-      private int _currentHealth;
+        [Header("Stats")] [SerializeField] private int maxHealth = 10;
 
-      public void TakeDamage(float damage)
-      {
-          _currentHealth -= (int)damage;
-          if (_currentHealth <= 0)
-          {
-              Destroy(gameObject);
-          }
+        private int currentHealth;
 
-          Debug.Log($"Event {nameof(DamageTakenEvent)} published for {this.Id()}");
-          EventManager.Publish(new DamageTakenEvent(damage), this.Id());
-      }
+        private Rigidbody rb;
+        private float timer;
 
-      private void Awake()
-      {
-          _rb = GetComponent<Rigidbody>();
-          _rb.useGravity = false;
-          _currentHealth = maxHealth;
-      }
+        private void Awake()
+        {
+            rb = GetComponent<Rigidbody>();
+            rb.useGravity = false;
+            currentHealth = maxHealth;
+        }
 
-      private void Start()
-      {
-          if (!player)
-          {
-              GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-              if (playerObj)
-              {
-                  player = playerObj.transform;
-              }
-          }
-      }
+        private void Start()
+        {
+            if (!player)
+            {
+                var playerObj = GameObject.FindGameObjectWithTag("Player");
+                if (playerObj) player = playerObj.transform;
+            }
+        }
 
-      private void Update()
-      {
-          _timer += Time.deltaTime;
-          if (_timer >= shootInterval)
-          {
-              Fire();
-              _timer = 0f;
-          }
+        private void Update()
+        {
+            timer += Time.deltaTime;
+            if (timer >= shootInterval)
+            {
+                Fire();
+                timer = 0f;
+            }
 
-          HandleMovement();
-      }
+            HandleMovement();
+        }
 
-      private void HandleMovement()
-      {
-          if (!player) return;
+        public void TakeDamage(float damage)
+        {
+            currentHealth -= (int)damage;
+            if (currentHealth <= 0)
+            {
+                EventManager.Publish(new EnemyKilledEvent(transform.position), this.Id());
+                Destroy(gameObject);
+            }
 
-          Vector3 horizontalPos = new Vector3(transform.position.x, 0f, transform.position.z);
-          Vector3 playerHorizPos = new Vector3(player.position.x, 0f, player.position.z);
-          float distance = Vector3.Distance(horizontalPos, playerHorizPos);
+            Debug.Log($"Event {nameof(DamageTakenEvent)} published for {this.Id()}");
+            EventManager.Publish(new DamageTakenEvent(damage), this.Id());
+        }
 
-          float desiredY = player.position.y + offsetAbovePlayer;
-          if (bobAmplitude > 0f)
-          {
-              desiredY += Mathf.Sin(Time.time * bobFrequency) * bobAmplitude;
-          }
+        private void HandleMovement()
+        {
+            if (!player) return;
 
-          if (distance > orbitDistance)
-          {
-              Vector3 direction = (playerHorizPos - horizontalPos).normalized;
-              Vector3 velocity = direction * approachSpeed;
-            
-              _rb.linearVelocity = new Vector3(velocity.x, 0f, velocity.z);
-          }
-          else
-          {
-              _rb.linearVelocity = Vector3.zero;
-              transform.RotateAround(player.position, Vector3.up, orbitSpeed * Time.deltaTime);
-          }
+            var horizontalPos = new Vector3(transform.position.x, 0f, transform.position.z);
+            var playerHorizPos = new Vector3(player.position.x, 0f, player.position.z);
+            var distance = Vector3.Distance(horizontalPos, playerHorizPos);
 
-          Vector3 currentPos = transform.position;
-          currentPos.y = desiredY;
-          transform.position = currentPos;
+            var desiredY = player.position.y + offsetAbovePlayer;
+            if (bobAmplitude > 0f) desiredY += Mathf.Sin(Time.time * bobFrequency) * bobAmplitude;
 
-          Vector3 lookDir = (player.position - transform.position);
-          lookDir.y = 0f;
-          if (lookDir.sqrMagnitude > 0.001f)
-          {
-              Quaternion targetRot = Quaternion.LookRotation(lookDir);
-              transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 5f);
-          }
-      }
+            if (distance > orbitDistance)
+            {
+                var direction = (playerHorizPos - horizontalPos).normalized;
+                var velocity = direction * approachSpeed;
 
-      private void Fire()
-      {
-        var directionToPlayer = (player.position - transform.position).normalized;
-        var startingPosition = transform.position + directionToPlayer * 2f;
-        var bullet = Instantiate(bulletPrefab, startingPosition, Quaternion.identity);
-        bullet.transform.forward = directionToPlayer;
-      }
-  }
+                rb.linearVelocity = new Vector3(velocity.x, 0f, velocity.z);
+            }
+            else
+            {
+                rb.linearVelocity = Vector3.zero;
+                transform.RotateAround(player.position, Vector3.up, orbitSpeed * Time.deltaTime);
+            }
+
+            var currentPos = transform.position;
+            currentPos.y = desiredY;
+            transform.position = currentPos;
+
+            var lookDir = player.position - transform.position;
+            lookDir.y = 0f;
+            if (lookDir.sqrMagnitude > 0.001f)
+            {
+                var targetRot = Quaternion.LookRotation(lookDir);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 5f);
+            }
+        }
+
+        private void Fire()
+        {
+            var directionToPlayer = (player.position - transform.position).normalized;
+            var startingPosition = transform.position + directionToPlayer * 2f;
+            var bullet = Instantiate(bulletPrefab, startingPosition, Quaternion.identity);
+            bullet.transform.forward = directionToPlayer;
+        }
+    }
 }

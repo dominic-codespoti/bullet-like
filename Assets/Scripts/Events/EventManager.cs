@@ -1,74 +1,57 @@
 using System;
 using System.Collections.Generic;
-using BulletLike.Events;
 
-public class EventManager
+namespace Events
 {
-    private const int GlobalId = int.MinValue;
-
-    private static readonly Dictionary<Type, Dictionary<int, List<Delegate>>> _eventListeners = new();
-
-    public static void Subscribe<T>(Action<T> listener, int? id = null) where T : BaseEvent
+    public class EventManager
     {
-        var eventType = typeof(T);
-        var actualId = id ?? GlobalId;
+        private const int GlobalId = int.MinValue;
 
-        if (!_eventListeners.ContainsKey(eventType))
+        private static readonly Dictionary<Type, Dictionary<int, List<Delegate>>> EventListeners = new();
+
+        public static void Subscribe<T>(Action<T> listener, int? id = null) where T : BaseEvent
         {
-            _eventListeners[eventType] = new Dictionary<int, List<Delegate>>();
+            var eventType = typeof(T);
+            var actualId = id ?? GlobalId;
+
+            if (!EventListeners.ContainsKey(eventType)) EventListeners[eventType] = new Dictionary<int, List<Delegate>>();
+
+            if (!EventListeners[eventType].ContainsKey(actualId))
+                EventListeners[eventType][actualId] = new List<Delegate>();
+
+            EventListeners[eventType][actualId].Add(listener);
         }
 
-        if (!_eventListeners[eventType].ContainsKey(actualId))
+        public static void Unsubscribe<T>(Action<T> listener, int? id = null) where T : BaseEvent
         {
-            _eventListeners[eventType][actualId] = new List<Delegate>();
-        }
+            var eventType = typeof(T);
+            var actualId = id ?? GlobalId;
 
-        _eventListeners[eventType][actualId].Add(listener);
-    }
-
-    public static void Unsubscribe<T>(Action<T> listener, int? id = null) where T : BaseEvent
-    {
-        var eventType = typeof(T);
-        var actualId = id ?? GlobalId;
-
-        if (_eventListeners.ContainsKey(eventType) &&
-            _eventListeners[eventType].ContainsKey(actualId))
-        {
-            _eventListeners[eventType][actualId].Remove(listener);
-
-            if (_eventListeners[eventType][actualId].Count == 0)
+            if (EventListeners.ContainsKey(eventType) &&
+                EventListeners[eventType].ContainsKey(actualId))
             {
-                _eventListeners[eventType].Remove(actualId);
-            }
+                EventListeners[eventType][actualId].Remove(listener);
 
-            if (_eventListeners[eventType].Count == 0)
-            {
-                _eventListeners.Remove(eventType);
-            }
-        }
-    }
+                if (EventListeners[eventType][actualId].Count == 0) EventListeners[eventType].Remove(actualId);
 
-    public static void Publish<T>(T eventToPublish, int? id = null) where T : BaseEvent
-    {
-        var eventType = typeof(T);
-        var actualId = id ?? GlobalId;
-
-        if (_eventListeners.ContainsKey(eventType) && _eventListeners[eventType].ContainsKey(actualId))
-        {
-            foreach (var listener in _eventListeners[eventType][actualId])
-            {
-                (listener as Action<T>)?.Invoke(eventToPublish);
+                if (EventListeners[eventType].Count == 0) EventListeners.Remove(eventType);
             }
         }
 
-        if (id != GlobalId &&
-            _eventListeners.ContainsKey(eventType) &&
-            _eventListeners[eventType].ContainsKey(GlobalId))
+        public static void Publish<T>(T eventToPublish, int? id = null) where T : BaseEvent
         {
-            foreach (var listener in _eventListeners[eventType][GlobalId])
-            {
-                (listener as Action<T>)?.Invoke(eventToPublish);
-            }
+            var eventType = typeof(T);
+            var actualId = id ?? GlobalId;
+
+            if (EventListeners.ContainsKey(eventType) && EventListeners[eventType].ContainsKey(actualId))
+                foreach (var listener in EventListeners[eventType][actualId])
+                    (listener as Action<T>)?.Invoke(eventToPublish);
+
+            if (id != GlobalId &&
+                EventListeners.ContainsKey(eventType) &&
+                EventListeners[eventType].ContainsKey(GlobalId))
+                foreach (var listener in EventListeners[eventType][GlobalId])
+                    (listener as Action<T>)?.Invoke(eventToPublish);
         }
     }
 }

@@ -1,54 +1,52 @@
-using BulletLike.Projectiles;
+using Projectiles;
 using UnityEngine;
 
-namespace BulletLike.Player
+namespace Player
 {
-  public class AttackController : MonoBehaviour
-  {
-      [Header("Prefabs")]
-      [Tooltip("Main projectile to use. If null, we use the fallback.")]
-      [SerializeField] private Projectile projectilePrefab;
-    
-      [Header("Settings")]
-      [Tooltip("Time between shots.")]
-      [SerializeField] private float fireRate = 0.2f;
-    
-      [Tooltip("Distance in front of the camera to spawn the projectile.")]
-      [SerializeField] private float spawnDistance = 2f;
+    public class AttackController : MonoBehaviour
+    {
+        [Header("Prefabs")] [Tooltip("Main projectile to use. If null, we use the fallback.")] [SerializeField]
+        private Projectile projectilePrefab;
 
-      private float _fireTimer;
+        [Header("Settings")] [Tooltip("Time between shots.")] [SerializeField]
+        private float fireRate = 0.2f;
 
-      private void Update()
-      {
-          _fireTimer += Time.deltaTime;
+        [Tooltip("Distance in front of the camera to spawn the projectile.")] [SerializeField]
+        private float spawnDistance = 2f;
 
-          if (Input.GetMouseButtonDown(0) && _fireTimer >= fireRate)
-          {
-              FireProjectile();
-              _fireTimer = 0f;
-          }
-      }
+        private float fireTimer;
 
-      private void FireProjectile()
-      {
-          Projectile prefabToUse = projectilePrefab;
-          if (!prefabToUse)
-          {
-              Debug.LogWarning("No primary or fallback projectile assigned. Unable to fire.");
-              return;
-          }
+        private void Update()
+        {
+            fireTimer += Time.deltaTime;
 
-          Camera cam = Camera.main;
-          if (!cam)
-          {
-              Debug.LogWarning("No MainCamera found. Unable to fire.");
-              return;
-          }
+            if (Input.GetMouseButtonDown(0) && fireTimer >= fireRate)
+            {
+                FireProjectile();
+                fireTimer = 0f;
+            }
+        }
 
-          Vector3 spawnPosition = cam.transform.position + cam.transform.forward * spawnDistance;
-          Quaternion spawnRotation = cam.transform.rotation;
+        private void FireProjectile()
+        {
+            var prefabToUse = projectilePrefab;
+            if (!prefabToUse)
+            {
+                Debug.LogWarning("No primary or fallback projectile assigned. Unable to fire.");
+                return;
+            }
 
-          Instantiate(prefabToUse, spawnPosition, spawnRotation);
-      }
-  }
+            var cam = Camera.main;
+            if (!cam)
+            {
+                Debug.LogWarning("No MainCamera found. Unable to fire.");
+                return;
+            }
+
+            var spawnPosition = cam.transform.position + cam.transform.forward * spawnDistance;
+            var spawnRotation = cam.transform.rotation;
+
+            Instantiate(prefabToUse, spawnPosition, spawnRotation);
+        }
+    }
 }

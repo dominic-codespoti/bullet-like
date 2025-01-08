@@ -17,7 +17,7 @@ namespace BulletLike
       [SerializeField] private Wave[] waves;
       [SerializeField] private float timeBetweenWaves = 5f;
 
-      private int _currentWaveIndex = 0;
+      private int currentWaveIndex = 0;
 
       private void Start()
       {
@@ -26,13 +26,13 @@ namespace BulletLike
 
       private IEnumerator SpawnWaves()
       {
-          while (_currentWaveIndex < waves.Length)
+          while (currentWaveIndex < waves.Length)
           {
-              Wave wave = waves[_currentWaveIndex];
+              Wave wave = waves[currentWaveIndex];
               yield return StartCoroutine(SpawnSingleWave(wave));
 
-              _currentWaveIndex++;
-              if (_currentWaveIndex < waves.Length)
+              currentWaveIndex++;
+              if (currentWaveIndex < waves.Length)
               {
                   yield return new WaitForSeconds(timeBetweenWaves);
               }

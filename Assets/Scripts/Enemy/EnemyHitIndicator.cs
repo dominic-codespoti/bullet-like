@@ -1,34 +1,33 @@
 using System.Collections;
-using BulletLike.Events;
-using BulletLike.GameObjectExtensions;
+using Events;
 using UnityEngine;
 
-namespace BulletLike.Enemy
+namespace Enemy
 {
-  public class EnemyHitIndicator : MonoBehaviour
-  {
-      [Header("Settings")]
-      [SerializeField] private float flashDuration = 0.2f;
-      [SerializeField] private Color flashColor = Color.red;
+    public class EnemyHitIndicator : MonoBehaviour
+    {
+        [Header("Settings")] [SerializeField] private float flashDuration = 0.2f;
 
-      public void Awake()
-      {
-          Debug.Log($"Subscribed to {nameof(DamageTakenEvent)} for {this.Id()}");
-          EventManager.Subscribe<DamageTakenEvent>(FlashOnDamage, this.Id());
-      }
+        [SerializeField] private Color flashColor = Color.red;
 
-      private void FlashOnDamage(DamageTakenEvent damageTakenEvent)
-      {
-          StartCoroutine(FlashCoroutine());
-      }
+        public void Awake()
+        {
+            Debug.Log($"Subscribed to {nameof(DamageTakenEvent)} for {this.Id()}");
+            EventManager.Subscribe<DamageTakenEvent>(FlashOnDamage, this.Id());
+        }
 
-      private IEnumerator FlashCoroutine()
-      {
-          var renderer = GetComponent<Renderer>();
-          var originalColor = renderer.material.color;
-          renderer.material.color = flashColor;
-          yield return new WaitForSeconds(flashDuration);
-          renderer.material.color = originalColor;
-      }
-  }
+        private void FlashOnDamage(DamageTakenEvent damageTakenEvent)
+        {
+            StartCoroutine(FlashCoroutine());
+        }
+
+        private IEnumerator FlashCoroutine()
+        {
+            var renderer = GetComponent<Renderer>();
+            var originalColor = renderer.material.color;
+            renderer.material.color = flashColor;
+            yield return new WaitForSeconds(flashDuration);
+            renderer.material.color = originalColor;
+        }
+    }
 }
