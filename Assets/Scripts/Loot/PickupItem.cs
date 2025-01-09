@@ -13,7 +13,7 @@ namespace Loot
             var firstPersonController = other.gameObject.GetComponent<FirstPersonController>();
             if (firstPersonController)
             {
-                EventManager.Publish(new OnItemPickupEvent(this), this.Id());
+                EventManager.Publish(new OnItemPickupEvent(this), firstPersonController.Id());
                 Destroy(gameObject);
             }
         }

@@ -123,7 +123,7 @@ public class WorldGenerator : MonoBehaviour
         Vector3 playerPos = new Vector3(randomRoom.position.x, 1.5f, randomRoom.position.y);
         if (playerPrefab != null)
         {
-            Instantiate(playerPrefab, playerPos, Quaternion.identity);
+            playerPrefab.transform.position = playerPos;
         }
 
         // Spawner
