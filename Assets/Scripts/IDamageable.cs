@@ -1,7 +1,4 @@
-namespace BulletLike
+public interface IDamageable
 {
-  public interface IDamageable
-  {
-      void TakeDamage(float damage);
-  }
+    void TakeDamage(float damage);
 }

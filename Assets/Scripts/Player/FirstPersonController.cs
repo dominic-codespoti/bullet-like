@@ -1,83 +1,77 @@
 using UnityEngine;
 
-namespace BulletLike.Player
+namespace Player
 {
-  [RequireComponent(typeof(CharacterController))]
-  public class FirstPersonController : MonoBehaviour
-  {
-      [Header("Movement Settings")]
-      [SerializeField] private float walkSpeed = 6f;
-      [SerializeField] private float sprintSpeed = 8f;
-      [SerializeField] private float jumpHeight = 1.5f;
-      [SerializeField] private float gravity = -9.81f;
+    [RequireComponent(typeof(CharacterController))]
+    public class FirstPersonController : MonoBehaviour
+    {
+        [Header("Movement Settings")]
+        [SerializeField] private float walkSpeed = 6f;
+        [SerializeField] private float sprintSpeed = 8f;
+        [SerializeField] private float jumpHeight = 1.5f;
+        [SerializeField] private float gravity = -9.81f;
 
-      [Header("Look Settings")]
-      [SerializeField] private float mouseSensitivity = 600f;
-      [SerializeField, Tooltip("Clamp vertical look angle to prevent flipping upside down.")]
-      private float verticalLookLimit = 80f;
+        [Header("Look Settings")]
+        [SerializeField] private float mouseSensitivity = 600f;
+        [SerializeField] private float verticalLookLimit = 80f;
 
-      private CharacterController _controller;
-      private Transform _cameraTransform;
+        private float cameraPitch;
+        private Transform cameraTransform;
+        private CharacterController controller;
 
-      private float _cameraPitch = 0f;
-      private float _verticalVelocity = 0f;
-      private bool _isSprinting;
+        private bool isSprinting;
+        private float verticalVelocity;
+        
+        private void Awake()
+        {
+            controller = GetComponent<CharacterController>();
+            cameraTransform = Camera.main.transform;
+        }
 
-      private void Awake()
-      {
-          _controller = GetComponent<CharacterController>();
-          _cameraTransform = Camera.main.transform;
-      }
+        private void Start()
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
 
-      private void Start()
-      {
-          Cursor.lockState = CursorLockMode.Locked;
-          Cursor.visible = false;
-      }
+        private void Update()
+        {
+            HandleLook();
+            HandleMovement();
+        }
 
-      private void Update()
-      {
-          HandleLook();
-          HandleMovement();
-      }
+        private void HandleMovement()
+        {
+            isSprinting = Input.GetKey(KeyCode.LeftShift);
+            var targetSpeed = isSprinting ? sprintSpeed : walkSpeed;
 
-      private void HandleMovement()
-      {
-          _isSprinting = Input.GetKey(KeyCode.LeftShift);
-          float targetSpeed = _isSprinting ? sprintSpeed : walkSpeed;
+            var horizontal = Input.GetAxis("Horizontal");
+            var vertical = Input.GetAxis("Vertical");
 
-          float horizontal = Input.GetAxis("Horizontal");
-          float vertical = Input.GetAxis("Vertical");
+            var moveDirection = (transform.forward * vertical + transform.right * horizontal).normalized;
 
-          Vector3 moveDirection = (transform.forward * vertical + transform.right * horizontal).normalized;
+            if (controller.isGrounded && verticalVelocity < 0f) verticalVelocity = -2f;
 
-          if (_controller.isGrounded && _verticalVelocity < 0f)
-          {
-              _verticalVelocity = -2f;
-          }
+            if (controller.isGrounded && Input.GetButtonDown("Jump"))
+                verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
 
-          if (_controller.isGrounded && Input.GetButtonDown("Jump"))
-          {
-              _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
-          }
+            verticalVelocity += gravity * Time.deltaTime;
 
-          _verticalVelocity += gravity * Time.deltaTime;
+            var velocity = moveDirection * targetSpeed + Vector3.up * verticalVelocity;
 
-          Vector3 velocity = moveDirection * targetSpeed + Vector3.up * _verticalVelocity;
+            controller.Move(velocity * Time.deltaTime);
+        }
 
-          _controller.Move(velocity * Time.deltaTime);
-      }
+        private void HandleLook()
+        {
+            var mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+            transform.Rotate(Vector3.up * mouseX);
 
-      private void HandleLook()
-      {
-          float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-          transform.Rotate(Vector3.up * mouseX);
+            var mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+            cameraPitch -= mouseY;
+            cameraPitch = Mathf.Clamp(cameraPitch, -verticalLookLimit, verticalLookLimit);
 
-          float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
-          _cameraPitch -= mouseY;  
-          _cameraPitch = Mathf.Clamp(_cameraPitch, -verticalLookLimit, verticalLookLimit);
-
-          _cameraTransform.localEulerAngles = new Vector3(_cameraPitch, 0f, 0f);
-      }
-  }
+            cameraTransform.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
+        }
+    }
 }
