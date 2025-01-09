@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7721350713176718634}
   - component: {fileID: 1207855520133521958}
   m_Layer: 0
-  m_Name: Pickup
+  m_Name: Damage Pick Up
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -122,7 +122,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b74699356fa47ffbe49fb665db8597a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 0}
+  passiveItem: {fileID: 11400000, guid: 051a846f760c65b48b6cda71b1dbf7f3, type: 2}
 --- !u!135 &1207855520133521958
 SphereCollider:
   m_ObjectHideFlags: 0

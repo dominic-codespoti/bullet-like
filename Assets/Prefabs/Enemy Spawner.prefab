@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3854399258271885868}
   - component: {fileID: 8836494323230338512}
+  - component: {fileID: 9089148042375921858}
   m_Layer: 0
   m_Name: Enemy Spawner
   m_TagString: Untagged
@@ -45,8 +46,29 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waves:
-  - enemyPrefab: {fileID: 6867737347094076912, guid: 7eef76e29850d544c9801df08c639b50, type: 3}
-    count: 1
-    spawnInterval: 10
-    spawnRadius: 25
+  - enemyPrefab: {fileID: 1204560879364137500, guid: 7eef76e29850d544c9801df08c639b50, type: 3}
+    enemiesToSpawn: 3
+    secondsBetweenSpawns: 2
+    spawnAreaSize: {x: 25, y: 5, z: 25}
   timeBetweenWaves: 5
+--- !u!65 &9089148042375921858
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3279223426649212408}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}

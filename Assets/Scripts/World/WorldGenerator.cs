@@ -117,24 +117,21 @@ public class WorldGenerator : MonoBehaviour
     {
         if (rooms == null || rooms.Count == 0) return;
 
-        // Random room
+        // Player
         int randomIndex = Random.Range(0, rooms.Count);
         RoomData randomRoom = rooms[randomIndex];
         Vector3 playerPos = new Vector3(randomRoom.position.x, 1.5f, randomRoom.position.y);
-
         if (playerPrefab != null)
         {
             Instantiate(playerPrefab, playerPos, Quaternion.identity);
         }
 
-        // Enemies
+        // Spawner
         foreach (RoomData room in rooms)
         {
             if (enemySpawnerPrefab != null)
             {
-                float spawnerX = Random.Range(room.xMin, room.xMax);
-                float spawnerZ = Random.Range(room.yMin, room.yMax);
-                Vector3 spawnerPos = new Vector3(spawnerX, 0.5f, spawnerZ);
+                Vector3 spawnerPos = new Vector3(room.position.x, 1.5f, room.position.y);
                 Instantiate(enemySpawnerPrefab, spawnerPos, Quaternion.identity);
             }
         }

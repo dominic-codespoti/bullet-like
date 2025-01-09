@@ -1,21 +1,20 @@
 using Events;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Loot
 {
-    public class LootTable : MonoBehaviour
+    public class LootDropper : MonoBehaviour
     {
         [System.Serializable]
         public class Loot
         {
-            public PassiveItem passiveItem;
-            public float dropChance;
+            public PickupItem DroppedItem;
+            public float DropChance;
         }
 
         [SerializeField] private Loot[] lootTable;
 
-        public void Start()
+        private void Start()
         {
             EventManager.Subscribe<EnemyKilledEvent>(DropLoot, this.Id());
         }
@@ -23,16 +22,20 @@ namespace Loot
         private void DropLoot(EnemyKilledEvent evt)
         {
             var position = evt.Position;
+
             foreach (var loot in lootTable)
             {
-                if (!(Random.value * 100f <= loot.dropChance)) continue;
+                if (!(Random.value * 100f <= loot.DropChance))
+                {
+                    continue;
+                }
+
                 var pickupPrefab = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 var pickup = pickupPrefab.AddComponent<PickupItem>();
                 pickupPrefab.AddComponent<SphereCollider>().isTrigger = true;
                 pickupPrefab.AddComponent<Rigidbody>().useGravity = true;
-                pickup.passiveItem = loot.passiveItem;
-
                 pickupPrefab.transform.position = position;
+                pickup.passiveItem = loot.DroppedItem.passiveItem;
                 return;
             }
         }

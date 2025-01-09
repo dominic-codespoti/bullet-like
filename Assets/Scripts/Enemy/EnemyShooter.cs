@@ -42,13 +42,8 @@ namespace Enemy
 
         private int currentHealth;
 
-<<<<<<< HEAD
-          EventManager.Publish(new DamageTakenEvent(damage), this.Id());
-      }
-=======
         private Rigidbody rb;
         private float timer;
->>>>>>> 3572179cb9145b48675104758bf06e5264e10b3b
 
         private void Awake()
         {

@@ -8,14 +8,7 @@ namespace Enemy
     {
         [Header("Settings")] [SerializeField] private float flashDuration = 0.2f;
 
-<<<<<<< HEAD
-      public void Awake()
-      {
-          EventManager.Subscribe<DamageTakenEvent>(FlashOnDamage, this.Id());
-      }
-=======
         [SerializeField] private Color flashColor = Color.red;
->>>>>>> 3572179cb9145b48675104758bf06e5264e10b3b
 
         public void Awake()
         {
