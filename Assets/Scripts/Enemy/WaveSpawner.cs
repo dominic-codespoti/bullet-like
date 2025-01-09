@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace BulletLike
+namespace BulletLike.Enemy
 {
   public class WaveSpawner : MonoBehaviour
   {
@@ -17,11 +17,14 @@ namespace BulletLike
       [SerializeField] private Wave[] waves;
       [SerializeField] private float timeBetweenWaves = 5f;
 
+      private GameObject _player;
+
       private int _currentWaveIndex = 0;
 
       private void Start()
       {
           StartCoroutine(SpawnWaves());
+          _player = GameObject.FindGameObjectWithTag("Player");
       }
 
       private IEnumerator SpawnWaves()
@@ -41,6 +44,11 @@ namespace BulletLike
 
       private IEnumerator SpawnSingleWave(Wave wave)
       {
+          if (!_player || _player.transform.position.sqrMagnitude > wave.spawnRadius * wave.spawnRadius)
+          {
+              yield break;
+          }
+
           for (int i = 0; i < wave.count; i++)
           {
               // Pick a random point in a sphere around this spawner

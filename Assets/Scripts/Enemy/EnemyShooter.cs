@@ -51,7 +51,6 @@ namespace BulletLike.Enemy
               Destroy(gameObject);
           }
 
-          Debug.Log($"Event {nameof(DamageTakenEvent)} published for {this.Id()}");
           EventManager.Publish(new DamageTakenEvent(damage), this.Id());
       }
 
