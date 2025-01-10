@@ -36,41 +36,18 @@ namespace BulletLike.Enemy
 
         private void Awake()
         {
-            // Ensure the BoxCollider is present and configured as a trigger
             spawnAreaCollider = GetComponent<BoxCollider>();
             spawnAreaCollider.isTrigger = true;
 
-            // Initialize BoxCollider to default size
             if (waves.Length > 0)
             {
                 SetSpawnArea(waves[0].spawnAreaSize);
-            }
-            else
-            {
-                Debug.LogWarning("No waves configured for WaveSpawner.");
             }
         }
 
         private void Start()
         {
-            // Find the player by tag
             _player = GameObject.FindGameObjectWithTag("Player");
-            if (_player == null)
-            {
-                Debug.LogError("Player with tag 'Player' not found in the scene.");
-            }
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.gameObject == _player && !isPlayerInside)
-            {
-                isPlayerInside = true;
-                if (!isSpawning && currentWaveIndex < waves.Length)
-                {
-                    spawningCoroutine = StartCoroutine(SpawnWaves());
-                }
-            }
         }
 
         private void OnTriggerExit(Collider other)
@@ -84,7 +61,42 @@ namespace BulletLike.Enemy
                     spawningCoroutine = null;
                 }
                 isSpawning = false;
-                currentWaveIndex = 0; // Optionally reset wave index or handle as needed
+            }
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject == _player && !isPlayerInside)
+            {
+                isPlayerInside = true;
+
+                if (!isSpawning && currentWaveIndex < waves.Length)
+                {
+                    spawningCoroutine = StartCoroutine(SpawnWaves());
+                }
+            }
+        }
+
+        /// <summary>
+        /// Coroutine to spawn a single wave of enemies.
+        /// </summary>
+        /// <param name="wave">The wave configuration.</param>
+        private IEnumerator SpawnSingleWave(Wave wave)
+        {
+            for (int i = 0; i < wave.enemiesToSpawn; i++)
+            {
+                if (!isPlayerInside)
+                {
+                    Debug.Log("Player exited spawn area. Stopping wave spawning.");
+                    yield break;
+                }
+
+                Vector3 spawnPos = GetRandomSpawnPosition(wave.spawnAreaSize);
+                Instantiate(wave.enemyPrefab, spawnPos, Quaternion.identity);
+
+                Debug.Log($"Spawned enemy {i + 1}/{wave.enemiesToSpawn} in wave {currentWaveIndex + 1}.");
+
+                yield return new WaitForSeconds(wave.secondsBetweenSpawns);
             }
         }
 
@@ -95,39 +107,34 @@ namespace BulletLike.Enemy
         {
             isSpawning = true;
 
-            while (currentWaveIndex < waves.Length && isPlayerInside)
+            while (currentWaveIndex < waves.Length)
             {
-                Wave currentWave = waves[currentWaveIndex];
+                if (!isPlayerInside)
+                {
+                    Debug.Log("Player exited spawn area. Stopping wave spawning.");
+                    yield break;
+                }
 
-                // Adjust the spawn area to match the current wave's requirements
+                Wave currentWave = waves[currentWaveIndex];
+                Debug.Log($"Starting wave {currentWaveIndex + 1}/{waves.Length}.");
+
                 SetSpawnArea(currentWave.spawnAreaSize);
 
                 yield return StartCoroutine(SpawnSingleWave(currentWave));
 
                 currentWaveIndex++;
+                Debug.Log($"Finished wave {currentWaveIndex}/{waves.Length}.");
 
-                if (currentWaveIndex < waves.Length && isPlayerInside)
+                if (currentWaveIndex < waves.Length)
                 {
                     yield return new WaitForSeconds(timeBetweenWaves);
                 }
             }
 
+            Debug.Log("All waves completed.");
             isSpawning = false;
         }
 
-        /// <summary>
-        /// Coroutine to spawn a single wave of enemies.
-        /// </summary>
-        /// <param name="wave">The wave configuration.</param>
-        private IEnumerator SpawnSingleWave(Wave wave)
-        {
-            for (int i = 0; i < wave.enemiesToSpawn && isPlayerInside; i++)
-            {
-                Vector3 spawnPos = GetRandomSpawnPosition(wave.spawnAreaSize);
-                Instantiate(wave.enemyPrefab, spawnPos, Quaternion.identity);
-                yield return new WaitForSeconds(wave.secondsBetweenSpawns);
-            }
-        }
 
         /// <summary>
         /// Sets the BoxCollider's size to define the spawn area.
@@ -158,10 +165,8 @@ namespace BulletLike.Enemy
                 return transform.position;
             }
 
-            // Get the bounds of the spawn area
             Bounds bounds = spawnAreaCollider.bounds;
 
-            // Generate random positions within the bounds
             float randomX = Random.Range(bounds.min.x, bounds.max.x);
             float randomY = Random.Range(bounds.min.y, bounds.max.y);
             float randomZ = Random.Range(bounds.min.z, bounds.max.z);

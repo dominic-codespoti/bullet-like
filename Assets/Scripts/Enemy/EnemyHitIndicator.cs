@@ -12,7 +12,6 @@ namespace Enemy
 
         public void Awake()
         {
-            Debug.Log($"Subscribed to {nameof(DamageTakenEvent)} for {this.Id()}");
             EventManager.Subscribe<DamageTakenEvent>(FlashOnDamage, this.Id());
         }
 

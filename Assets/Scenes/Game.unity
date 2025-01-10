@@ -757,14 +757,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbfdcedd720e233489b9d22c3a6ed5ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridWidth: 100
-  gridHeight: 100
+  gridWidth: 200
+  gridHeight: 200
   numberOfRooms: 5
   roomSizeMin: {x: 25, y: 25}
   roomSizeMax: {x: 25, y: 25}
-  voxelPrefab: {fileID: 701859359744904639, guid: c3d1a1173a8b2334d87ac80a60420683, type: 3}
-  wallHeight: 3
-  roofHeight: 5
+  floorPrefab: {fileID: 3372013999024882266, guid: 25ecb0b2c48f60449953eb21f5a9e6df, type: 3}
+  wallPrefab: {fileID: 5629927433600565851, guid: a66d53a11a7e8814d93faec9d67c5459, type: 3}
+  roofPrefab: {fileID: 1647078138833255510, guid: 50dd4082313aa2e41927bbad52a142f1, type: 3}
+  roofHeight: 7
   enemySpawnerPrefab: {fileID: 3279223426649212408, guid: fa6e07ef10d13e245a02d61938740367, type: 3}
   playerPrefab: {fileID: 1346953948}
 --- !u!1001 &1111784853

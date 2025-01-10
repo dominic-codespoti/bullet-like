@@ -49,7 +49,7 @@ MonoBehaviour:
   - enemyPrefab: {fileID: 1204560879364137500, guid: 7eef76e29850d544c9801df08c639b50, type: 3}
     enemiesToSpawn: 3
     secondsBetweenSpawns: 2
-    spawnAreaSize: {x: 25, y: 5, z: 25}
+    spawnAreaSize: {x: 20, y: 5, z: 20}
   timeBetweenWaves: 5
 --- !u!65 &9089148042375921858
 BoxCollider:

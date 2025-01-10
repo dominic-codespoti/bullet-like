@@ -5,11 +5,16 @@ namespace Projectiles
     [RequireComponent(typeof(Rigidbody))]
     public class Projectile : MonoBehaviour
     {
-        [SerializeField] private float damage = 10f;
         [SerializeField] private float speed = 20f;
         [SerializeField] private float lifeTime = 5f;
+        [SerializeField] private float damage = 0f;
 
         private Rigidbody rb;
+
+        public void SetDamage(float damage)
+        {
+            this.damage = damage;
+        }
 
         private void Awake()
         {
@@ -25,7 +30,10 @@ namespace Projectiles
         private void OnCollisionEnter(Collision collision)
         {
             IDamageable damageable = collision.collider.GetComponent<IDamageable>();
-            if (damageable != null) damageable.TakeDamage(damage);
+            if (damageable != null) 
+            {
+                damageable.TakeDamage(damage);
+            }
 
             Destroy(gameObject);
         }

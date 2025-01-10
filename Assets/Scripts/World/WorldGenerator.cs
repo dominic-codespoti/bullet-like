@@ -12,10 +12,11 @@ public class WorldGenerator : MonoBehaviour
     public Vector2Int roomSizeMax = new Vector2Int(10, 10);
 
     [Header("Voxel Prefab (1x1x1)")]
-    public GameObject voxelPrefab;
+    public GameObject floorPrefab;
+    public GameObject wallPrefab;
+    public GameObject roofPrefab;
 
     [Header("Wall / Roof Settings")]
-    public float wallHeight = 3f;
     public float roofHeight = 5f;
 
     public GameObject enemySpawnerPrefab;
@@ -87,13 +88,13 @@ public class WorldGenerator : MonoBehaviour
         }
 
         // Floors
-        grid.InstantiateFloors(voxelPrefab, transform);
+        grid.InstantiateFloors(floorPrefab, transform);
 
         // Walls (now referencing roofHeight so they meet the roof)
-        grid.InstantiateWalls(voxelPrefab, transform, roofHeight);
+        grid.InstantiateWalls(wallPrefab, transform, roofHeight);
 
         // Roofs
-        grid.InstantiateRoofs(voxelPrefab, transform, roofHeight);
+        grid.InstantiateRoofs(roofPrefab, transform, roofHeight);
     }
 
     private void MarkRoomsOnGrid()

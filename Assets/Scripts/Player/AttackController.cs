@@ -46,7 +46,8 @@ namespace Player
             var spawnPosition = cam.transform.position + cam.transform.forward * spawnDistance;
             var spawnRotation = cam.transform.rotation;
 
-            Instantiate(prefabToUse, spawnPosition, spawnRotation);
+            var obj = Instantiate(prefabToUse, spawnPosition, spawnRotation);
+            obj.SetDamage(10f);
         }
     }
 }
