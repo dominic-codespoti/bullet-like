@@ -30,12 +30,8 @@ namespace Loot
                     continue;
                 }
 
-                var pickupPrefab = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                var pickup = pickupPrefab.AddComponent<PickupItem>();
-                pickupPrefab.AddComponent<SphereCollider>().isTrigger = true;
-                pickupPrefab.AddComponent<Rigidbody>().useGravity = true;
+                var pickupPrefab = Instantiate(loot.DroppedItem.gameObject);
                 pickupPrefab.transform.position = position;
-                pickup.passiveItem = loot.DroppedItem.passiveItem;
                 return;
             }
         }

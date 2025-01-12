@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BulletLike.Enemy
@@ -22,17 +23,26 @@ namespace BulletLike.Enemy
             public Vector3 spawnAreaSize;
         }
 
+        private enum WaveState
+        {
+            NotStarted,
+            InProgress,
+            Completed
+        }
+
         [Header("Waves Configuration")]
         [SerializeField] private Wave[] waves;
         [SerializeField] private float timeBetweenWaves = 5f;
 
         private BoxCollider spawnAreaCollider;
         private GameObject _player;
-        private int currentWaveIndex = 0;
         private bool isPlayerInside = false;
         private bool isSpawning = false;
 
+        private Dictionary<int, WaveState> waveStates;
         private Coroutine spawningCoroutine;
+
+        private int totalEnemiesSpawned = 0; // Tracks total enemies spawned
 
         private void Awake()
         {
@@ -42,6 +52,13 @@ namespace BulletLike.Enemy
             if (waves.Length > 0)
             {
                 SetSpawnArea(waves[0].spawnAreaSize);
+            }
+
+            // Initialize wave states
+            waveStates = new Dictionary<int, WaveState>();
+            for (int i = 0; i < waves.Length; i++)
+            {
+                waveStates[i] = WaveState.NotStarted;
             }
         }
 
@@ -70,11 +87,44 @@ namespace BulletLike.Enemy
             {
                 isPlayerInside = true;
 
-                if (!isSpawning && currentWaveIndex < waves.Length)
+                if (!isSpawning && waveStates.ContainsValue(WaveState.NotStarted))
                 {
                     spawningCoroutine = StartCoroutine(SpawnWaves());
                 }
             }
+        }
+
+        /// <summary>
+        /// Coroutine to handle spawning multiple waves with delays.
+        /// </summary>
+        private IEnumerator SpawnWaves()
+        {
+            isSpawning = true;
+
+            for (int i = 0; i < waves.Length; i++)
+            {
+                if (!isPlayerInside || waveStates[i] != WaveState.NotStarted)
+                {
+                    continue; // Skip waves that are already in progress or completed
+                }
+
+                Wave currentWave = waves[i];
+                waveStates[i] = WaveState.InProgress;
+
+                SetSpawnArea(currentWave.spawnAreaSize);
+
+                yield return StartCoroutine(SpawnSingleWave(currentWave));
+
+                waveStates[i] = WaveState.Completed;
+                Debug.Log($"Finished wave {i + 1}/{waves.Length}.");
+
+                if (i < waves.Length - 1)
+                {
+                    yield return new WaitForSeconds(timeBetweenWaves);
+                }
+            }
+
+            isSpawning = false;
         }
 
         /// <summary>
@@ -87,54 +137,17 @@ namespace BulletLike.Enemy
             {
                 if (!isPlayerInside)
                 {
-                    Debug.Log("Player exited spawn area. Stopping wave spawning.");
                     yield break;
                 }
 
                 Vector3 spawnPos = GetRandomSpawnPosition(wave.spawnAreaSize);
                 Instantiate(wave.enemyPrefab, spawnPos, Quaternion.identity);
 
-                Debug.Log($"Spawned enemy {i + 1}/{wave.enemiesToSpawn} in wave {currentWaveIndex + 1}.");
+                totalEnemiesSpawned++;
 
                 yield return new WaitForSeconds(wave.secondsBetweenSpawns);
             }
         }
-
-        /// <summary>
-        /// Coroutine to handle spawning multiple waves with delays.
-        /// </summary>
-        private IEnumerator SpawnWaves()
-        {
-            isSpawning = true;
-
-            while (currentWaveIndex < waves.Length)
-            {
-                if (!isPlayerInside)
-                {
-                    Debug.Log("Player exited spawn area. Stopping wave spawning.");
-                    yield break;
-                }
-
-                Wave currentWave = waves[currentWaveIndex];
-                Debug.Log($"Starting wave {currentWaveIndex + 1}/{waves.Length}.");
-
-                SetSpawnArea(currentWave.spawnAreaSize);
-
-                yield return StartCoroutine(SpawnSingleWave(currentWave));
-
-                currentWaveIndex++;
-                Debug.Log($"Finished wave {currentWaveIndex}/{waves.Length}.");
-
-                if (currentWaveIndex < waves.Length)
-                {
-                    yield return new WaitForSeconds(timeBetweenWaves);
-                }
-            }
-
-            Debug.Log("All waves completed.");
-            isSpawning = false;
-        }
-
 
         /// <summary>
         /// Sets the BoxCollider's size to define the spawn area.
