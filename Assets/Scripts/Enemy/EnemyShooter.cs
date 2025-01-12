@@ -1,4 +1,5 @@
 using Events;
+using Player;
 using UnityEngine;
 
 namespace Enemy
@@ -12,6 +13,9 @@ namespace Enemy
 
         [SerializeField] private float shootInterval = 1f;
         [SerializeField] private float bulletSpeed = 10f;
+        
+        [Header("Contact Damage Settings")]
+        [SerializeField] private float contactDamage = 10f;
 
         [Header("Movement Settings")]
         [Tooltip("Player Transform to seek and orbit. If left empty, will try to find an object tagged 'Player'.")]
@@ -150,6 +154,15 @@ namespace Enemy
             if (bulletRb != null)
             {
                 bulletRb.linearVelocity = directionToPlayer * bulletSpeed;
+            }
+        }
+        
+        private void OnCollisionEnter(Collision collision)
+        {
+            var playerController = collision.gameObject.GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.TakeDamage(contactDamage);
             }
         }
     }

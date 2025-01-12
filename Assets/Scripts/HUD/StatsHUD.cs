@@ -20,7 +20,7 @@ namespace HUD
 
         private void Update()
         {
-            healthText.text = $"Health: {playerController.Health}";
+            healthText.text = $"Health: {playerController.CurrentHealth}";
             damageText.text = $"Damage: {playerController.Damage}";
             speedText.text = $"Speed: {playerController.Speed}";
         }

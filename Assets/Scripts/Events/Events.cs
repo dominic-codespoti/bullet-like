@@ -35,4 +35,32 @@ namespace Events
 
         public PickupItem Item { get; private set; }
     }
+    
+    
+    public class PlayerDeathEvent : BaseEvent
+    {
+        public PlayerDeathEvent()
+        {
+        }
+    }
+    
+    public class RoomClearedEvent : BaseEvent
+    {
+        public RoomClearedEvent(int roomId)
+        {
+            RoomID = roomId;
+        }
+
+        public int RoomID { get; private set; }
+    }
+    
+    public class PlayerEnteredRoomEvent : BaseEvent
+    {
+        public PlayerEnteredRoomEvent(int roomId)
+        {
+            RoomID = roomId;
+        }
+
+        public int RoomID { get; private set; }
+    }
 }
