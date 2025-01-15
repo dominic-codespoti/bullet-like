@@ -1,0 +1,5 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="root" style="flex-grow: 1;">
+        <engine:ProgressBar value="22" title="my-progress" name="health-bar" enabled="true" style="width: 25%; align-items: stretch; flex-direction: column; position: absolute; bottom: 2%; left: 2%;" />
+    </engine:VisualElement>
+</engine:UXML>

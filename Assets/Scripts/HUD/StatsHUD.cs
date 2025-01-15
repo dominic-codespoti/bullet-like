@@ -1,28 +1,27 @@
 using Player;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace HUD
 {
     public class StatsHUD : MonoBehaviour
     {
-        [SerializeField] private TextMeshProUGUI healthText;
-        [SerializeField] private TextMeshProUGUI damageText;
-        [SerializeField] private TextMeshProUGUI speedText;
-
+        private ProgressBar healthBar;
         private PlayerController playerController;
 
         private void Start()
         {
             playerController = FindFirstObjectByType<PlayerController>();
+            var root = GetComponent<UIDocument>().rootVisualElement;
+            healthBar = new ProgressBar(root.Q("health-bar"), new StyleColor(Color.red));
         }
 
         private void Update()
         {
-            healthText.text = $"Health: {playerController.CurrentHealth}";
-            damageText.text = $"Damage: {playerController.Damage}";
-            speedText.text = $"Speed: {playerController.Speed}";
+            if (playerController != null)
+            {
+                healthBar.SetProgress(min: 0, max: playerController.MaxHealth, value: playerController.CurrentHealth);
+            }
         }
     }
 }

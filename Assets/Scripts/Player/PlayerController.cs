@@ -11,7 +11,7 @@ namespace Player
         public float Damage { get; private set; } = 10f;
         public float Speed { get; private set; } = 5f;
 
-        private float MaxHealth { get; set; } = 100f;
+        public float MaxHealth { get; set; } = 100f;
 
         public float CurrentHealth { get; private set; } = 100f;
 

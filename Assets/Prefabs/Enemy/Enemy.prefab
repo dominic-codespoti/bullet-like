@@ -69,7 +69,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: -876546973899608171, guid: 4f0c8cb19ff0e5841a9356254fc76597, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -167,13 +167,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 5214080406096899325, guid: 22d5d9cb85d44664592af016ba5786aa, type: 3}
   shootInterval: 1
-  bulletCount: 10
   bulletSpeed: 10
+  contactDamage: 10
   player: {fileID: 0}
   orbitDistance: 5
   approachSpeed: 3
   orbitSpeed: 45
-  offsetAbovePlayer: 2
+  offsetAboveInitial: 2
   bobAmplitude: 0.5
   bobFrequency: 2
   maxHealth: 10
